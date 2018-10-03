@@ -24,7 +24,7 @@ NAME = f"{SEQ_LEN}-SEQ-{BATCH_SIZE}-BATCH-{int(time.time())}"
 
 
 def prepare(df):
-	df.drop(['Event','Before PM','After PM','end_date','Nozzle-A','Nozzle-B','Nozzle-C','Nozzle-D','Nozzle-E','Nozzle-F','Nozzle-G','Nozzle-H','Nozzle-I','Nozzle-J','Nozzle-K','Nozzle-L','Nozzle-M','Nozzle-N','Nozzle-O','Nozzle-P','Nozzle-Q','Nozzle-R','Nozzle-S','Nozzle-T','Nozzle-U','Nozzle-V','Nozzle-W','Nozzle-X','Nozzle-Y','Nozzle-Z'],axis=1,inplace=True)
+	df.drop(['Event','Before PM','After PM','end_date','Nozzle-A','Nozzle-B','Nozzle-C','Nozzle-D','Nozzle-E','Nozzle-F','Nozzle-G','Nozzle-H','Nozzle-I','Nozzle-J','Nozzle-K','Nozzle-L','Nozzle-M	','Nozzle-N','Nozzle-O','Nozzle-P','Nozzle-Q','Nozzle-R','Nozzle-S','Nozzle-T','Nozzle-U','Nozzle-V','Nozzle-W','Nozzle-X','Nozzle-Y','Nozzle-Z'],axis=1,inplace=True)
 	df.start_dt = pd.to_datetime(df.start_dt)
 	df.sort_values(['start_dt'],inplace=True)
 	df.iloc[:,4:-1] = preprocessing.RobustScaler().fit_transform(df.iloc[:,4:-1])
