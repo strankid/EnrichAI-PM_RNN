@@ -89,64 +89,64 @@ def preprocess(df,heads, validation=False):
 
 	return np.array(X), y
 
+if __name__ == "__main__":
+	df = pd.read_csv("final_model_sep_27.csv")
+	df = prepare(df)
 
-df = pd.read_csv("final_model_sep_27.csv")
-df = prepare(df)
+	heads_train = df.head_id.unique()#[VALIDATION_HEADS:]
+	heads_validation = df.head_id.unique()#[:VALIDATION_HEADS]
 
-heads_train = df.head_id.unique()#[VALIDATION_HEADS:]
-heads_validation = df.head_id.unique()#[:VALIDATION_HEADS]
-
-train_x, train_y = preprocess(df,heads_train)
-validation_x, validation_y = preprocess(df,heads_validation, validation=True)
-
-
-
-model = Sequential()
-model.add(CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
-
-model.add(CuDNNLSTM(128, return_sequences=True))
-model.add(Dropout(0.1))
-model.add(BatchNormalization())
-
-model.add(CuDNNLSTM(128))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
-
-model.add(Dense(32, activation='relu'))
-model.add(Dropout(0.2))
-
-model.add(Dense(2, activation='softmax'))
+	train_x, train_y = preprocess(df,heads_train)
+	validation_x, validation_y = preprocess(df,heads_validation, validation=True)
 
 
-opt = tf.keras.optimizers.Adam(lr=0.001, decay=1e-6)
 
-# Compile model
-model.compile(
-    loss='sparse_categorical_crossentropy',
-    optimizer=opt,
-    metrics=['accuracy']
-)
+	model = Sequential()
+	model.add(CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
+	model.add(Dropout(0.2))
+	model.add(BatchNormalization())
 
-tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
+	model.add(CuDNNLSTM(128, return_sequences=True))
+	model.add(Dropout(0.1))
+	model.add(BatchNormalization())
 
-#filepath = "RNN_Final-{epoch:02d}-{val_acc:.3f}"  # unique file name that will include the epoch and the validation acc for that epoch
-#checkpoint = ModelCheckpoint("models/{}.model".format(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')) # saves only the best ones
+	model.add(CuDNNLSTM(128))
+	model.add(Dropout(0.2))
+	model.add(BatchNormalization())
 
-# Train model
-history = model.fit(
-    train_x, train_y,
-    batch_size=BATCH_SIZE,
-    epochs=EPOCHS,
-    validation_data=(validation_x, validation_y),
-    callbacks=[tensorboard],#, checkpoint],
-)
+	model.add(Dense(32, activation='relu'))
+	model.add(Dropout(0.2))
 
-# Score model
-score = model.evaluate(validation_x, validation_y, verbose=0)
-print('Test loss:', score[0])
-print('Test accuracy:', score[1])
-# Save model
-model.save("models/{}.h5".format(NAME))
+	model.add(Dense(2, activation='softmax'))
+
+
+	opt = tf.keras.optimizers.Adam(lr=0.001, decay=1e-6)
+
+	# Compile model
+	model.compile(
+	    loss='sparse_categorical_crossentropy',
+	    optimizer=opt,
+	    metrics=['accuracy']
+	)
+
+	tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
+
+	#filepath = "RNN_Final-{epoch:02d}-{val_acc:.3f}"  # unique file name that will include the epoch and the validation acc for that epoch
+	#checkpoint = ModelCheckpoint("models/{}.model".format(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')) # saves only the best ones
+
+	# Train model
+	history = model.fit(
+	    train_x, train_y,
+	    batch_size=BATCH_SIZE,
+	    epochs=EPOCHS,
+	    validation_data=(validation_x, validation_y),
+	    callbacks=[tensorboard],#, checkpoint],
+	)
+
+	# Score model
+	score = model.evaluate(validation_x, validation_y, verbose=0)
+	print('Test loss:', score[0])
+	print('Test accuracy:', score[1])
+	# Save model
+	model.save("models/{}.h5".format(NAME))
 
