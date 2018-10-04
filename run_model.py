@@ -12,11 +12,7 @@ MODEL_NAME = 'models/10-SEQ-10-BATCH-1538502212.h5'
 df = pd.read_csv("final_dataset.csv")
 df = train_func.prepare_test(df)
 
-
 heads = df.head_id.unique()
-
-final_seq = []
-final_head = []
 
 final_result_0 = []
 final_result_1 = []
