@@ -42,7 +42,7 @@ final_df['head'] = heads
 final_df['result_0'] = final_result_0
 final_df['result_1'] = final_result_1
 
-final_df.to_csv('results.csv')
+final_df.to_csv('results.csv', index=False)
 
 print(result)
 
