@@ -98,30 +98,37 @@ def preprocess_train(df,heads, validation=False):
 
 	return np.array(X), y
 
-def preprocess_test(df, heads):
+def preprocess_test(df, head):
 
 	sequential_data = []
 	prev_days = deque(maxlen=SEQ_LEN)
 
-	for head in heads:
-		data = df[df['head_id']==head]
-		data.sort_values(['start_dt'], inplace=True)
-		data.drop(['end_dt','head_id','module_position'],axis=1,inplace=True) 
-		day = data.iloc[0,0].day        
-		for i in data.values:
-			if((i[0].day<=day+2)|((i[0].day==1)&(day>=30))):
-				prev_days.append(i[1:])
-				if len(prev_days) == SEQ_LEN:
-					sequential_data.append(np.array(prev_days))
-			else:
-				prev_days.clear()
-			day = i[0].day
-		prev_days.clear()
-
-	random.shuffle(sequential_data)
-	#print(pd.DataFrame(sequential_data).shape)
 	
-	return np.array(sequential_data)
+	data = df[df['head_id']==head]
+	data.sort_values(['start_dt'], inplace=True)
+	data.drop(['end_dt','head_id','module_position'],axis=1,inplace=True) 
+	day = data.iloc[0,0].day        
+	for i in data.values:
+		if((i[0].day<=day+2)|((i[0].day==1)&(day>=30))):
+			prev_days.append(i[1:])
+			if len(prev_days) == SEQ_LEN:
+				sequential_data.append([np.array(prev_days), head])
+		else:
+			prev_days.clear()
+		day = i[0].day
+	prev_days.clear()
+
+	#random.shuffle(sequential_data)
+	sequential_data = sequential_data[-1:]
+
+	X = []
+	y = []
+
+	for seq, head in sequential_data:  
+		X.append(seq)  
+		y.append(head) 
+
+	return (np.array(X), y)
 
 
 
