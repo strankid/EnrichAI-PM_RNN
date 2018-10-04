@@ -23,7 +23,7 @@ NAME = f"{SEQ_LEN}-SEQ-{BATCH_SIZE}-BATCH-{int(time.time())}"
 
 
 
-def prepare(df):
+def prepare_train(df):
 	df.drop(['Event','Before PM','After PM','end_date','Nozzle-A','Nozzle-B','Nozzle-C','Nozzle-D','Nozzle-E','Nozzle-F','Nozzle-G','Nozzle-H','Nozzle-I','Nozzle-J','Nozzle-K','Nozzle-L','Nozzle-M','Nozzle-N','Nozzle-O','Nozzle-P','Nozzle-Q','Nozzle-R','Nozzle-S','Nozzle-T','Nozzle-U','Nozzle-V','Nozzle-W','Nozzle-X','Nozzle-Y','Nozzle-Z'],axis=1,inplace=True)
 	df.start_dt = pd.to_datetime(df.start_dt)
 	df.sort_values(['start_dt'],inplace=True)
@@ -34,7 +34,16 @@ def prepare(df):
 
 	return df
 
-def preprocess(df,heads, validation=False):
+def prepare_test(df):
+	df.drop(['Event','end_date'],axis=1,inplace=True)
+	df.start_dt = pd.to_datetime(df.start_dt)
+	df.sort_values(['start_dt'],inplace=True)
+	df.iloc[:,4:] = preprocessing.RobustScaler().fit_transform(df.iloc[:,4:])
+	df.dropna(inplace=True)
+
+	return df
+
+def preprocess_train(df,heads, validation=False):
 
 	sequential_data = []
 	prev_days = deque(maxlen=SEQ_LEN)
@@ -89,15 +98,42 @@ def preprocess(df,heads, validation=False):
 
 	return np.array(X), y
 
+def preprocess_test(df, heads):
+
+	sequential_data = []
+	prev_days = deque(maxlen=SEQ_LEN)
+
+	for head in heads:
+		data = df[df['head_id']==head]
+		data.sort_values(['start_dt'], inplace=True)
+		data.drop(['end_dt','head_id','module_position'],axis=1,inplace=True) 
+		day = data.iloc[0,0].day        
+		for i in data.values:
+			if((i[0].day<=day+2)|((i[0].day==1)&(day>=30))):
+				prev_days.append(i[1:])
+				if len(prev_days) == SEQ_LEN:
+					sequential_data.append(np.array(prev_days))
+			else:
+				prev_days.clear()
+			day = i[0].day
+		prev_days.clear()
+
+	random.shuffle(sequential_data)
+	#print(pd.DataFrame(sequential_data).shape)
+	
+	return np.array(sequential_data)
+
+
+
 if __name__ == "__main__":
 	df = pd.read_csv("final_model_sep_27.csv")
-	df = prepare(df)
+	df = prepare_train(df)
 
 	heads_train = df.head_id.unique()#[VALIDATION_HEADS:]
 	heads_validation = df.head_id.unique()#[:VALIDATION_HEADS]
 
-	train_x, train_y = preprocess(df,heads_train)
-	validation_x, validation_y = preprocess(df,heads_validation, validation=True)
+	train_x, train_y = preprocess_train(df,heads_train)
+	validation_x, validation_y = preprocess_train(df,heads_validation, validation=True)
 
 
 
