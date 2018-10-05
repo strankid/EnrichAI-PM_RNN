@@ -5,7 +5,7 @@ from tensorflow.keras.models import load_model
 
 import train_model as train_func
 
-MODEL_NAME = 'models/10-SEQ-10-BATCH-1538502212.h5'
+MODEL_NAME = 'models/10-SEQ-10-BATCH-1538723763.h5'
 
 #heads = []   #enter the name of head inside the list
 

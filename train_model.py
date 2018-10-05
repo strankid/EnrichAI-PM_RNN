@@ -9,7 +9,7 @@ import time
 
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, CuDNNLSTM, BatchNormalization
+from tensorflow.keras.layers import Dense, Dropout, LSTM, BatchNormalization
 from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.callbacks import ModelCheckpoint
 
@@ -145,17 +145,20 @@ if __name__ == "__main__":
 
 
 	model = Sequential()
-	model.add(CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
+	model.add(LSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
 	model.add(Dropout(0.2))
 	model.add(BatchNormalization())
 
-	model.add(CuDNNLSTM(128, return_sequences=True))
+	model.add(LSTM(128, return_sequences=True))
 	model.add(Dropout(0.1))
 	model.add(BatchNormalization())
 
-	model.add(CuDNNLSTM(128))
+	model.add(LSTM(128))
 	model.add(Dropout(0.2))
 	model.add(BatchNormalization())
+
+	model.add(Dense(64, activation='relu'))
+	model.add(Dropout(0.2))
 
 	model.add(Dense(32, activation='relu'))
 	model.add(Dropout(0.2))
