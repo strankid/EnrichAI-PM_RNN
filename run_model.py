@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+from tensorflow.keras import backend as K 
 
 import train_model as train_func
 
@@ -16,6 +17,8 @@ heads = df.head_id.unique()
 
 final_result_0 = []
 final_result_1 = []
+
+K.clear_session()
 
 model = load_model(MODEL_NAME)
 
