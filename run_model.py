@@ -1,3 +1,5 @@
+#implement a vectorized approach
+
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -23,7 +25,7 @@ K.clear_session()
 model = load_model(MODEL_NAME)
 
 for head in heads:
-	test_X, head = train_func.preprocess_test(df, head)
+	test_X = train_func.preprocess_test(df, head)
 	if len(test_X)==0:
 		result_0 = 1
 		result_1 = 0

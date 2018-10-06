@@ -112,7 +112,7 @@ def preprocess_test(df, head):
 		if((i[0].day<=day+2)|((i[0].day==1)&(day>=30))):
 			prev_days.append(i[1:])
 			if len(prev_days) == SEQ_LEN:
-				sequential_data.append([np.array(prev_days), head])
+				sequential_data.append(np.array(prev_days))
 		else:
 			prev_days.clear()
 		day = i[0].day
@@ -121,18 +121,11 @@ def preprocess_test(df, head):
 	#random.shuffle(sequential_data)
 	sequential_data = sequential_data[-1:]
 
-	X = []
-	y = []
-
-	for seq, head in sequential_data:  
-		X.append(seq)  
-		y.append(head) 
-
-	return (np.array(X), y)
+	return np.array(sequential_data)
 
 
 
-if __name__ == "__main__":
+def main():
 	df = pd.read_csv("final_model_sep_27.csv")
 	df = prepare_train(df)
 
@@ -195,4 +188,7 @@ if __name__ == "__main__":
 	print('Test accuracy:', score[1])
 	# Save model
 	model.save("models/{}.h5".format(NAME))
+
+if __name__ == "__main__":
+	main()
 
