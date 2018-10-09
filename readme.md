@@ -1,5 +1,5 @@
 
-			       			#RNN for Predictive Maintenence 
+			       			RNN for Predictive Maintenence 
 
 
 The project consists of 3 steps. 
