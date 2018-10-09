@@ -1,5 +1,5 @@
 
-			       			##RNN for Predictive Maintenence 
+			       			#RNN for Predictive Maintenence 
 
 
 The project consists of 3 steps. 
@@ -17,8 +17,6 @@ Building the model: Our model is built using keras. It consists of 3 LSTM layers
 Long short-term memory (LSTM) units are units of a recurrent neural network (RNN).  A common LSTM unit is composed of a cell, an input gate, an output gate and a forget gate. The cell remembers values over arbitrary time intervals and the three gates regulate the flow of information into and out of the cell.  A great article that explains LSTM: http://colah.github.io/posts/2015-08-Understanding-LSTMs/. 
 
 Dense layers are just regular densely connected NN Layer. Dense implements the operation: output = activation(dot(input, kernel) + bias) where activation is the element-wise activation function passed as the activation argument, kernel is a weights matrix created by the layer, and bias is a bias vector created by the layer (only applicable if use_bias is True). Find out more at: https://keras.io/layers/core/
-
-Our model architecture somewhat resembles the picture below. The difference is that we have 3 LSTM layers and 2 Dense layers.
 
 
 
