@@ -15,7 +15,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 
 FUTURE_LENGTH = 1
-VALIDATION_HEADS = 12
+VALIDATION_HEADS = 10
 SEQ_LEN = 10
 EPOCHS = 100  
 BATCH_SIZE = 10 
@@ -66,29 +66,33 @@ def preprocess_train(df,heads, validation=False):
 	random.shuffle(sequential_data)
 	#print(pd.DataFrame(sequential_data).shape)
 
+	#if validation==False:
+	positives = []
+	negatives = []
+
+	for seq, target in sequential_data:  
+		if target == 0:  
+			negatives.append([seq, target])  
+		elif target == 1:  
+			positives.append([seq, target])  
+
+	random.shuffle(positives)  
+	random.shuffle(negatives)  
+
+	lower = min(len(positives), len(negatives)) 
+	
 	if validation==False:
-		positives = []
-		negatives = []
-
-		for seq, target in sequential_data:  
-			if target == 0:  
-				negatives.append([seq, target])  
-			elif target == 1:  
-				positives.append([seq, target])  
-
-		random.shuffle(positives)  
-		random.shuffle(negatives)  
-
-		lower = min(len(positives), len(negatives)) 
-
 		positives = positives[:lower]  
 		negatives = negatives[:2*lower]  
 	
-		sequential_data = positives+negatives
-	
-		random.shuffle(sequential_data)
-		#print(pd.DataFrame(sequential_data).shape)
-	
+	if validation == True:
+		sequential_data = positives
+	if validation == False:	
+		sequential_data = positives + negatives
+
+	random.shuffle(sequential_data)
+	#print(pd.DataFrame(sequential_data).shape)
+
 	X = []
 	y = []
 
@@ -127,10 +131,10 @@ def main():
 	df = pd.read_csv("final_model_sep_27.csv")
 	df = prepare_train(df)
 
-	heads_train = df.head_id.unique()#[VALIDATION_HEADS:]
-	heads_validation = df.head_id.unique()#[:VALIDATION_HEADS]
+	heads_train = df.head_id.unique()[VALIDATION_HEADS:]
+	heads_validation = df.head_id.unique()[:VALIDATION_HEADS]
 
-	train_x, train_y = preprocess_train(df,heads_train)
+	train_x, train_y = preprocess_train(df,heads_train, validation=False)
 	validation_x, validation_y = preprocess_train(df,heads_validation, validation=True)
 
 
