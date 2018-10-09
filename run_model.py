@@ -8,7 +8,7 @@ from tensorflow.keras import backend as K
 
 import train_model as train_func
 
-MODEL_NAME = 'models/10-SEQ-10-BATCH-1538723763.h5'
+MODEL_NAME = 'models/RNN_Final-97-0.833.model'
 
 #heads = []   #enter the name of head inside the list
 
@@ -43,7 +43,7 @@ final_df['head'] = heads
 final_df['result_0'] = final_result_0
 final_df['result_1'] = final_result_1
 
-final_df.to_csv('results.csv', index=False)
+final_df.to_csv('results_updated.csv', index=False)
 
 print(result)
 

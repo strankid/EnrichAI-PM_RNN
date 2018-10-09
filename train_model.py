@@ -28,10 +28,6 @@ def prepare_train(df):
 	df.start_dt = pd.to_datetime(df.start_dt)
 	df.sort_values(['start_dt'],inplace=True)
 	df.iloc[:,4:-1] = preprocessing.RobustScaler().fit_transform(df.iloc[:,4:-1])
-	df['target'] = df.parent_event.shift(-FUTURE_LENGTH)
-	df.dropna(inplace=True)
-	df.head
-
 	return df
 
 def prepare_test(df):
@@ -51,7 +47,11 @@ def preprocess_train(df,heads, validation=False):
 	for head in heads:
 		data = df[df['head_id']==head]
 		data.sort_values(['start_dt'], inplace=True)
-		data.drop(['end_dt','head_id','module_position','parent_event'],axis=1,inplace=True) 
+		data['target'] = data.parent_event.shift(-FUTURE_LENGTH)
+		data.dropna(inplace=True) 	
+		if(data.shape[0] == 0):
+			continue	
+		data.drop(['end_dt','head_id','module_position','parent_event'],axis=1,inplace=True)
 		day = data.iloc[0,0].day        
 		for i in data.values:
 			if((i[0].day<=day+2)|((i[0].day==1)&(day>=30))):
@@ -102,8 +102,6 @@ def preprocess_test(df, head):
 
 	sequential_data = []
 	prev_days = deque(maxlen=SEQ_LEN)
-
-	
 	data = df[df['head_id']==head]
 	data.sort_values(['start_dt'], inplace=True)
 	data.drop(['end_dt','head_id','module_position'],axis=1,inplace=True) 
@@ -170,8 +168,8 @@ def main():
 
 	tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
 
-	#filepath = "RNN_Final-{epoch:02d}-{val_acc:.3f}"  # unique file name that will include the epoch and the validation acc for that epoch
-	#checkpoint = ModelCheckpoint("models/{}.model".format(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')) # saves only the best ones
+	filepath = "RNN_Final-{epoch:02d}-{val_acc:.3f}"  # unique file name that will include the epoch and the validation acc for that epoch
+	checkpoint = ModelCheckpoint("models/{}.model".format(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')) # saves only the best ones
 
 	# Train model
 	history = model.fit(
@@ -179,7 +177,7 @@ def main():
 	    batch_size=BATCH_SIZE,
 	    epochs=EPOCHS,
 	    validation_data=(validation_x, validation_y),
-	    callbacks=[tensorboard],#, checkpoint],
+	    callbacks=[tensorboard, checkpoint],
 	)
 
 	# Score model
